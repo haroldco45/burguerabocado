@@ -123,17 +123,15 @@
             if ("geolocation" in navigator) {
                 navigator.geolocation.getCurrentPosition(
                     (pos) => {
-                        // Formato Estándar de Google Maps
-                        const lat = pos.coords.latitude;
-                        const lon = pos.coords.longitude;
-                        const mapUrl = `https://www.google.com/maps?q=${lat},${lon}`;
+                        // CORRECCIÓN: URL estándar de Google Maps
+                        const mapUrl = `https://www.google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}`;
                         sendOrder(name, ref, mapUrl);
                     },
                     (err) => {
                         document.getElementById('loading-gps').classList.add('hidden');
-                        alert("ERROR GPS: Asegúrate de dar PERMISO a la ubicación y tener el GPS encendido.");
-                        if(confirm("¿Enviar pedido solo con la referencia escrita?")) {
-                            sendOrder(name, ref, "Ubicación GPS no proporcionada");
+                        alert("ERROR GPS: Activa tu ubicación y dale 'Permitir'.");
+                        if(confirm("¿Enviar pedido sin GPS pero con referencia?")) {
+                            sendOrder(name, ref, "Ubicación GPS no disponible");
                         }
                     }, 
                     geoOptions
@@ -156,7 +154,7 @@
                             `📦 *Cantidad:* ${quantity}%0A` +
                             `👤 *Cliente:* ${name}%0A` +
                             `🏠 *Referencia:* ${ref}%0A` +
-                            `📍 *Ubicación Real:* ${gps}%0A` +
+                            `📍 *Mapa:* ${gps}%0A` +
                             `📅 *Fecha:* ${fechaStr}%0A` +
                             `⏰ *Hora:* ${horaStr}%0A` +
                             `-------------------------------%0A` +
