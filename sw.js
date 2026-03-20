@@ -1,5 +1,5 @@
 const CACHE_NAME = 'burguer-cache-v1';
-const assets = ['./', './index.html', './manifest.json'];
+const assets = ['./', './index.html', './manifest.json', './br.JPG'];
 
 self.addEventListener('install', e => {
   e.waitUntil(
