@@ -3,7 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Boton Rojo Burguer | Vibras Positivas</title>
+    <title>Boton Rojo | Burguerabocados</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#000000">
+    <link rel="apple-touch-icon" href="https://via.placeholder.com/192/dc2626/ffffff?text=BR">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -24,8 +29,7 @@
             border: 4px solid #333;
             border-top: 4px solid #dc2626;
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
+            width: 40px; height: 40px;
             animation: spin 1s linear infinite;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -36,27 +40,19 @@
     <div id="setup-screen" class="hidden fixed inset-0 bg-white z-50 p-8 flex flex-col justify-center text-black">
         <h2 class="text-3xl font-black mb-2 uppercase italic leading-none text-gray-900">CONFIGURA TU</h2>
         <h2 class="text-5xl font-black text-red-600 mb-6 uppercase leading-none">BOTÓN ROJO</h2>
-        
-        <input type="text" id="userName" placeholder="¿Cómo te llamas?" 
-               class="w-full p-5 mb-4 border-2 border-gray-200 rounded-2xl font-bold text-xl outline-none focus:border-red-600">
-        
-        <input type="text" id="userAddress" placeholder="Referencia (Ej: Casa portón verde)" 
-               class="w-full p-5 mb-8 border-2 border-gray-200 rounded-2xl font-bold text-xl outline-none focus:border-red-600">
-        
-        <button onclick="saveData()" class="bg-red-600 text-white font-black py-5 rounded-2xl text-2xl uppercase shadow-2xl active:scale-95 transition">
-            ACTIVAR AHORA
-        </button>
+        <input type="text" id="userName" placeholder="¿Cómo te llamas?" class="w-full p-5 mb-4 border-2 border-gray-200 rounded-2xl font-bold text-xl outline-none focus:border-red-600">
+        <input type="text" id="userAddress" placeholder="Referencia de entrega" class="w-full p-5 mb-8 border-2 border-gray-200 rounded-2xl font-bold text-xl outline-none focus:border-red-600">
+        <button onclick="saveData()" class="bg-red-600 text-white font-black py-5 rounded-2xl text-2xl uppercase shadow-2xl active:scale-95 transition">ACTIVAR AHORA</button>
     </div>
 
     <div id="loading-gps" class="hidden fixed inset-0 bg-black/95 z-40 flex flex-col items-center justify-center text-white text-center p-10">
         <div class="loader mb-6"></div>
         <p class="font-black uppercase tracking-[0.2em] text-xl text-red-600">RASTREANDO GPS...</p>
-        <p class="text-gray-400 mt-2 text-sm italic">Buscando ubicación exacta para el domiciliario</p>
     </div>
 
     <div class="text-center w-full max-w-xs">
         <h1 class="text-yellow-400 text-3xl font-black italic mb-1 uppercase tracking-tighter">BURGUERABOCADOS</h1>
-        <p class="text-gray-500 text-[10px] font-bold uppercase tracking-[0.3em] mb-8">Elige cantidad y pide ya</p>
+        <p class="text-gray-500 text-[10px] font-bold uppercase tracking-[0.3em] mb-8 italic">PWA Edition - Master de Tulio</p>
         
         <div class="flex items-center justify-between bg-zinc-900 p-4 rounded-3xl mb-8 border border-zinc-800">
             <button onclick="updateQty(-1)" class="w-14 h-14 bg-zinc-800 text-white rounded-2xl text-3xl font-black active:bg-red-600 transition">-</button>
@@ -68,7 +64,7 @@
         </div>
 
         <button onclick="fireOrder()" class="pulse-red w-64 h-64 bg-red-600 rounded-full border-[12px] border-red-900/50 flex items-center justify-center active:scale-90 transition-transform shadow-[0_0_50px_rgba(220,38,38,0.4)] mx-auto">
-            <span class="text-white font-black text-4xl uppercase leading-none tracking-tighter italic">ENVIAR<br>PEDIDO</span>
+            <span class="text-white font-black text-4xl uppercase leading-none tracking-tighter italic text-center">ENVIAR<br>PEDIDO</span>
         </button>
 
         <div class="mt-10">
@@ -78,7 +74,7 @@
 
     <footer class="fixed bottom-6 text-center w-full">
         <div class="flex justify-center items-center gap-3">
-            <span class="text-white font-black text-sm italic tracking-widest">VIBRAS POSITIVAS</span>
+            <span class="text-white font-black text-sm italic tracking-widest uppercase">Vibras Positivas</span>
             <div class="h-2 w-2 bg-red-600 rounded-full animate-ping"></div>
         </div>
     </footer>
@@ -86,6 +82,13 @@
     <script>
         const whatsappNumber = "573117700431"; 
         let quantity = 1;
+
+        // Registro de Service Worker para PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js').catch(err => console.log('SW error', err));
+            });
+        }
 
         window.onload = () => {
             if (!localStorage.getItem('burguer_name')) {
@@ -105,66 +108,59 @@
                 localStorage.setItem('burguer_name', n);
                 localStorage.setItem('burguer_address', a);
                 document.getElementById('setup-screen').classList.add('hidden');
-            } else { alert("Ingresa tu nombre y referencia."); }
+            } else { alert("Ingresa tus datos."); }
         }
 
         function fireOrder() {
             const name = localStorage.getItem('burguer_name');
             const ref = localStorage.getItem('burguer_address');
-
             document.getElementById('loading-gps').classList.remove('hidden');
 
-            const geoOptions = {
-                enableHighAccuracy: true,
-                timeout: 10000, 
-                maximumAge: 0
-            };
+            const geoOptions = { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 };
 
             if ("geolocation" in navigator) {
                 navigator.geolocation.getCurrentPosition(
                     (pos) => {
-                        // CORRECCIÓN: URL estándar de Google Maps
                         const mapUrl = `https://www.google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}`;
                         sendOrder(name, ref, mapUrl);
                     },
                     (err) => {
                         document.getElementById('loading-gps').classList.add('hidden');
-                        alert("ERROR GPS: Activa tu ubicación y dale 'Permitir'.");
-                        if(confirm("¿Enviar pedido sin GPS pero con referencia?")) {
-                            sendOrder(name, ref, "Ubicación GPS no disponible");
+                        if(confirm("Error GPS. ¿Enviar solo con referencia?")) {
+                            sendOrder(name, ref, "No disponible");
                         }
                     }, 
                     geoOptions
                 );
-            } else {
-                sendOrder(name, ref, "Navegador sin soporte GPS");
-            }
+            } else { sendOrder(name, ref, "No soportado"); }
         }
 
         function sendOrder(name, ref, gps) {
             document.getElementById('loading-gps').classList.add('hidden');
-            
             const ahora = new Date();
             const fechaStr = ahora.toLocaleDateString('es-CO');
             const horaStr = ahora.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
+            
+            // GENERACIÓN DE NÚMERO DE PEDIDO DINÁMICO (Ej: AB-1234)
+            const orderNum = "AB-" + Math.floor(1000 + Math.random() * 9000);
 
-            const message = `*🚨 ALERTA PEDIDO BOTÓN ROJO*%0A` +
+            const message = `*🚨 NUEVO PEDIDO ${orderNum}*%0A` +
                             `-------------------------------%0A` +
                             `🍔 *Producto:* Burguerabocados%0A` +
                             `📦 *Cantidad:* ${quantity}%0A` +
                             `👤 *Cliente:* ${name}%0A` +
-                            `🏠 *Referencia:* ${ref}%0A` +
+                            `🏠 *Ref:* ${ref}%0A` +
                             `📍 *Mapa:* ${gps}%0A` +
                             `📅 *Fecha:* ${fechaStr}%0A` +
                             `⏰ *Hora:* ${horaStr}%0A` +
                             `-------------------------------%0A` +
-                            `*App desarrollada por vibras positivas derechos de autor*`;
+                            `_App PWA por Vibras Positivas ©_`;
 
             window.open(`https://wa.me/${whatsappNumber}?text=${message}`, '_blank');
         }
 
         function clearData() {
-            if(confirm("¿Deseas cambiar tu información?")) {
+            if(confirm("¿Cambiar datos?")) {
                 localStorage.clear();
                 location.reload();
             }
