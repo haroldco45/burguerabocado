@@ -1,13 +1,13 @@
 {
-  "name": "Botón Rojo | Burguerabocados",
-  "short_name": "Botón Rojo",
+  "name": "Boton Rojo Burguer",
+  "short_name": "Boton Rojo",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#000000",
   "theme_color": "#dc2626",
   "icons": [
     {
-      "src": "abocadorojo.JPG",
+      "src": "br.JPG",
       "sizes": "512x512",
       "type": "image/jpeg",
       "purpose": "any maskable"
